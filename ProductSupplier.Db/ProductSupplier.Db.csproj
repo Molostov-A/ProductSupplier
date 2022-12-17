@@ -17,4 +17,8 @@
     <ProjectReference Include="..\ProductSupplier.Models\ProductSupplier.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="Repositories\" />
+  </ItemGroup>
+
 </Project>
