@@ -10,33 +10,34 @@ namespace ProductSupplier.Db.Repositories
 {
     public class ProductRepository: IProductRepository
     {
-        private readonly DatabaseContext _databaseContext;
+        private readonly DatabaseContext _db;
         public ProductRepository(DatabaseContext databaseContext)
         {
-            _databaseContext = databaseContext;
+            _db = databaseContext;
         }
 
         public List<Product> GetAll()
         {
-            var value =  _databaseContext.Products.Include(p => p.Categories).ToList();
+            var value =  _db.Products.Include(p => p.Categories).ToList();
             return value;
         }
 
         public Product Get(Guid id)
         {
-            var product = _databaseContext.Products.FirstOrDefault(p => p.Id == id);
+            var product = _db.Products.FirstOrDefault(p => p.Id == id);
             return product;
         }
 
         public void Add(Product product)
         {
-            _databaseContext.Products.Add(product);
-            _databaseContext.SaveChanges();
+            _db.Products.Add(product);
+            _db.SaveChanges();
         }
 
         public void Delete(Product product)
         {
-            throw new NotImplementedException();
+            _db.Products.Remove(product);
+            _db.SaveChanges();
         }
 
         public void Update(Guid idOldProduct, Product newProduct)
@@ -46,7 +47,8 @@ namespace ProductSupplier.Db.Repositories
 
         public Product Find(Guid id)
         {
-            throw new NotImplementedException();
+            var product = _db.Products.FirstOrDefault(p => p.Id == id);
+            return product;
         }
     }
 }

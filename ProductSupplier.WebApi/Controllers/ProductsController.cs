@@ -23,10 +23,18 @@ namespace ProductSupplier.WebApi.Controllers
             _productRepository = productRepository;
         }
 
-        //GET/dot
+        
         public IEnumerable<Product> GetAll()
         {
             return _productRepository.GetAll();
+        }
+
+        [HttpGet("{id}", Name = "Product")]
+        public Product GetProduct(string id)
+        {
+            var productId = Guid.Parse(id);
+            var product = _productRepository.Find(productId);
+            return product;
         }
 
         [HttpPost]
@@ -49,6 +57,19 @@ namespace ProductSupplier.WebApi.Controllers
             _productRepository.Add(product);
             return new ObjectResult(product);
         }
+
+        [HttpDelete("{idProduct}")]
+        public IActionResult DeleteProduct(string idProduct)
+        {
+            var productId = Guid.Parse(idProduct);
+            var product = _productRepository.Find(productId);
+            if (product == null)
+            {
+                return BadRequest();
+            }
+            _productRepository.Delete(product);
+            return new ObjectResult(product);
+        }
     }
 
     public class CategoriesViewModel
@@ -62,5 +83,6 @@ namespace ProductSupplier.WebApi.Controllers
         public string Name { get; set; }
         public decimal Price { get; set; }
         public string Description { get; set; }
+
     }
 }
