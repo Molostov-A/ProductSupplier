@@ -6,39 +6,40 @@ using System.Linq;
 using System.Threading.Tasks;
 using ProductSupplier.Models;
 using ProductSupplier.Models.Interface;
+using ProductSupplier.WebApi.ViewModels;
 
 namespace ProductSupplier.WebApi.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    public class ProductsController : ControllerBase
+    public class ProductController : ControllerBase
     {
-        private readonly IProductRepository _productRepository;
-        private readonly ILogger<ProductsController> _logger;
+        private readonly IRepository<Product> _repository;
+        private readonly ILogger<ProductController> _logger;
 
 
-        public ProductsController(ILogger<ProductsController> logger, IProductRepository productRepository)
+        public ProductController(ILogger<ProductController> logger, IRepository<Product> repository)
         {
             _logger = logger;
-            _productRepository = productRepository;
+            _repository = repository;
         }
 
         
         public IEnumerable<Product> GetAll()
         {
-            return _productRepository.GetAll();
+            return _repository.GetAll();
         }
 
         [HttpGet("{id}", Name = "Product")]
-        public Product GetProduct(string id)
+        public Product GetUnit(string id)
         {
             var productId = Guid.Parse(id);
-            var product = _productRepository.Find(productId);
+            var product = _repository.Find(productId);
             return product;
         }
 
         [HttpPost]
-        public IActionResult AddProduct(ProductViewModel productViewModel)
+        public IActionResult Create(ProductViewModel productViewModel)
         {
             if (productViewModel == null)
             {
@@ -54,35 +55,21 @@ namespace ProductSupplier.WebApi.Controllers
                 Description = productViewModel.Description,
                 Categories = categories
             };
-            _productRepository.Add(product);
+            _repository.Add(product);
             return new ObjectResult(product);
         }
 
         [HttpDelete("{idProduct}")]
-        public IActionResult DeleteProduct(string idProduct)
+        public IActionResult Delete(string idProduct)
         {
             var productId = Guid.Parse(idProduct);
-            var product = _productRepository.Find(productId);
+            var product = _repository.Find(productId);
             if (product == null)
             {
                 return BadRequest();
             }
-            _productRepository.Delete(product);
+            _repository.Delete(product);
             return new ObjectResult(product);
         }
-    }
-
-    public class CategoriesViewModel
-    {
-        public string Name { get; set; }
-        public string Description { get; set; }
-    }
-
-    public class ProductViewModel
-    {
-        public string Name { get; set; }
-        public decimal Price { get; set; }
-        public string Description { get; set; }
-
     }
 }

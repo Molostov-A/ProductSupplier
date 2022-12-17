@@ -8,7 +8,7 @@ using ProductSupplier.Models.Interface;
 
 namespace ProductSupplier.Db.Repositories
 {
-    public class ProductRepository: IProductRepository
+    public class ProductRepository: IRepository<Product>
     {
         private readonly DatabaseContext _db;
         public ProductRepository(DatabaseContext databaseContext)
@@ -20,12 +20,6 @@ namespace ProductSupplier.Db.Repositories
         {
             var value =  _db.Products.Include(p => p.Categories).ToList();
             return value;
-        }
-
-        public Product Get(Guid id)
-        {
-            var product = _db.Products.FirstOrDefault(p => p.Id == id);
-            return product;
         }
 
         public void Add(Product product)
