@@ -12,6 +12,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProductSupplier.Db;
+using ProductSupplier.Db.Repositories;
+using ProductSupplier.Models.Interface;
 
 namespace ProductSupplier.WebApi
 {
@@ -30,6 +32,7 @@ namespace ProductSupplier.WebApi
             services.AddControllers();
             string connection = Configuration.GetConnectionString("product_supplier");
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connection));
+            services.AddTransient<IProductRepository, ProductRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

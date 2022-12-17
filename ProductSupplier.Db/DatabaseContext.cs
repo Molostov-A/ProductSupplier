@@ -10,6 +10,7 @@ namespace ProductSupplier.Db
         public DbSet<Category> Categories { get; set; }
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
+            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
     }

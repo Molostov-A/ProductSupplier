@@ -18,7 +18,8 @@ namespace ProductSupplier.Db.Repositories
 
         public List<Product> GetAll()
         {
-            return  _databaseContext.Products.Include(p => p.Id).ToList();
+            var value =  _databaseContext.Products.Include(p => p.Categories).ToList();
+            return value;
         }
 
         public Product Get(Guid id)
@@ -29,7 +30,8 @@ namespace ProductSupplier.Db.Repositories
 
         public void Add(Product product)
         {
-            throw new NotImplementedException();
+            _databaseContext.Products.Add(product);
+            _databaseContext.SaveChanges();
         }
 
         public void Delete(Product product)
