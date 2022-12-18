@@ -74,18 +74,22 @@ namespace ProductSupplier.WebApi.Controllers
             return new ObjectResult(MappingManyToManyModel.CategoryOutput(item));
         }
 
-        [HttpPut("{id}")]
-        public IActionResult Update(string id, [FromBody] Category item)
+        [HttpPatch("{id}")]
+        public IActionResult Update(string id, [FromBody] CategoryOutputModel itemInput)
         {
             var Id = Guid.Parse(id);
-            if (id == null || item.Id != Id)
+            if (id == null || itemInput.Id != Id)
             {
                 return BadRequest();
             }
-            var dbItem = _repositoryCategory.Find(id);
-            if (dbItem == null)
+
+            var dbItem = MappingManyToManyModel.CategoryInput(itemInput);
+            foreach (var product in dbItem.Products)
             {
-                return NotFound();
+                if (_repositoryProduct.Find(product.Id) == null)
+                {
+                    return BadRequest();
+                }
             }
             _repositoryCategory.Update(id, dbItem);
             var dbItemUpdate = _repositoryCategory.Find(id);
@@ -93,7 +97,7 @@ namespace ProductSupplier.WebApi.Controllers
         }
 
         [HttpPut("{idCategory}/{idProduct}")]
-        public IActionResult AddProductInCategory(string idCategory, string idProduct)
+        public IActionResult AddProductToCategory(string idCategory, string idProduct)
         {
             var category = _repositoryCategory.Find(idCategory);
             if (category == null)
@@ -116,6 +120,26 @@ namespace ProductSupplier.WebApi.Controllers
                     product
                 };
                 _repositoryCategory.Update(idCategory, category);
+            }
+            return new ObjectResult(MappingManyToManyModel.CategoryOutput(_repositoryCategory.Find(idCategory)));
+        }
+
+        [HttpDelete("{idCategory}/{idProduct}")]
+        public IActionResult DeleteProductFromCategory(string idCategory, string idProduct)
+        {
+            var category = _repositoryCategory.Find(idCategory);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            var product = _repositoryProduct.Find(idProduct);
+            if (category.Products != null)
+            {
+                if (category.Products.FirstOrDefault(c => c.Id == product.Id) == null)
+                {
+                    category.Products.Remove(product);
+                    _repositoryCategory.Update(idCategory, category);
+                }
             }
             return new ObjectResult(MappingManyToManyModel.CategoryOutput(_repositoryCategory.Find(idCategory)));
         }

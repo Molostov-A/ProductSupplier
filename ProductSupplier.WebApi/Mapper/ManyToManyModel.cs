@@ -51,6 +51,42 @@ namespace ProductSupplier.WebApi.Mapper
             }
             return outputModel;
         }
+        public static Product ProductInput(ProductOutputModel model)
+        {
+            var inputModel = new Product();
+            if (model.Categories != null)
+            {
+                var categories = new List<Category>();
+                foreach (var category in model.Categories)
+                {
+                    categories.Add(new Category()
+                    {
+                        Id = category.Id,
+                        Name = category.Name,
+                        Description = category.Description
+                    });
+                }
+                inputModel = new Product()
+                {
+                    Id = model.Id,
+                    Price = model.Price,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Categories = categories
+                };
+            }
+            else
+            {
+                inputModel = new Product()
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Categories = null
+                };
+            }
+            return inputModel;
+        }
         public static List<CategoryOutputModel> CategotyListOutput(List<Category> listCategory)
         {
             var listCategoryOutputModel = new List<CategoryOutputModel>();
@@ -95,6 +131,44 @@ namespace ProductSupplier.WebApi.Mapper
                 };
             }
             return outputModel;
+        }
+
+        public static Category CategoryInput(CategoryOutputModel model)
+        {
+            var inputModel = new Category();
+
+            if (model.Products != null)
+            {
+                var products = new List<Product>();
+                foreach (var product in model.Products)
+                {
+                    products.Add(new Product()
+                    {
+                        Id = product.Id,
+                        Price = product.Price,
+                        Name = product.Name,
+                        Description = product.Description
+                    });
+                }
+                inputModel = new Category()
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Products = products
+                };
+            }
+            else
+            {
+                inputModel = new Category()
+                {
+                    Id = model.Id,
+                    Name = model.Name,
+                    Description = model.Description,
+                    Products = null
+                };
+            }
+            return inputModel;
         }
     }
 }

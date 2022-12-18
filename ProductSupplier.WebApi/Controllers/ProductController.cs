@@ -50,8 +50,17 @@ namespace ProductSupplier.WebApi.Controllers
             {
                 return NotFound();
             }
-
             var categories = new List<Category>();
+            foreach (var idGuid in productViewModel.Categories)
+            {
+                var category = _repositoryCategory.Find(idGuid);
+                
+                if (category == null)
+                {
+                    return BadRequest();
+                }
+                categories.Add(category);
+            }
             var product = new Product()
             {
                 Id = Guid.NewGuid(),
@@ -62,6 +71,28 @@ namespace ProductSupplier.WebApi.Controllers
             };
             _repositoryProduct.Add(product);
             return new ObjectResult(MappingManyToManyModel.ProductOutput(product));
+        }
+
+        [HttpPatch("{id}")]
+        public IActionResult Update(string id, [FromBody] ProductOutputModel itemInput)
+        {
+            var Id = Guid.Parse(id);
+            if (id == null || itemInput.Id != Id)
+            {
+                return BadRequest();
+            }
+
+            var dbItem = MappingManyToManyModel.ProductInput(itemInput);
+            foreach (var category in dbItem.Categories)
+            {
+                if (_repositoryCategory.Find(category.Id) == null)
+                {
+                    return BadRequest();
+                }
+            }
+            _repositoryProduct.Update(id, dbItem);
+            var dbItemUpdate = _repositoryProduct.Find(id);
+            return new ObjectResult(MappingManyToManyModel.ProductOutput(dbItemUpdate));
         }
 
         [HttpDelete("{id}")]
@@ -78,7 +109,7 @@ namespace ProductSupplier.WebApi.Controllers
         }
 
         [HttpPut("{idProduct}/{idCategory}")]
-        public IActionResult AddCategoryInProduct(string idProduct, string idCategory)
+        public IActionResult AddCategoryToProduct(string idProduct, string idCategory)
         {
             var product = _repositoryProduct.Find(idProduct);
             if (product == null)
@@ -101,6 +132,27 @@ namespace ProductSupplier.WebApi.Controllers
                     category
                 };
                 _repositoryProduct.Update(idProduct, product);
+            }
+
+            return new ObjectResult(MappingManyToManyModel.ProductOutput(product));
+        }
+
+        [HttpDelete("{idProduct}/{idCategory}")]
+        public IActionResult RemoveCategoryFromProduct(string idProduct, string idCategory)
+        {
+            var product = _repositoryProduct.Find(idProduct);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            var category = _repositoryCategory.Find(idCategory);
+            if (product.Categories != null)
+            {
+                if (product.Categories.FirstOrDefault(c => c.Id == category.Id) == null)
+                {
+                    product.Categories.Remove(category);
+                    _repositoryProduct.Update(idProduct, product);
+                }
             }
 
             return new ObjectResult(MappingManyToManyModel.ProductOutput(product));

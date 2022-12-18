@@ -36,10 +36,23 @@ namespace ProductSupplier.Db.Repositories
 
         public void Update(Guid idOldProduct, Product newProduct)
         {
-            var product = _db.Products
-                .Include(c => c.Categories)
-                .Single(p => p.Id == idOldProduct);
-            product = newProduct;
+            var valuesList = _db.Products
+                .Include(p => p.Categories)
+                .FirstOrDefault(c => c.Id == idOldProduct);
+
+            _db.Products.Remove(valuesList);
+            var idCategories = new List<Guid>();
+            foreach (var category in newProduct.Categories)
+            {
+                idCategories.Add(category.Id);
+            }
+
+            newProduct.Categories = new List<Category>();
+            foreach (var id in idCategories)
+            {
+                newProduct.Categories.Add(_db.Categories.Find(id));
+            }
+            _db.Products.Add(newProduct);
             _db.SaveChanges();
         }
 
