@@ -1,5 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Internal;
+using Microsoft.Extensions.Configuration;
 using ProductSupplier.Models;
 
 namespace ProductSupplier.Db
@@ -10,7 +12,6 @@ namespace ProductSupplier.Db
         public DbSet<Category> Categories { get; set; }
         public DatabaseContext(DbContextOptions<DatabaseContext> options) : base(options)
         {
-            //Database.EnsureDeleted();
             Database.EnsureCreated();
         }
     }

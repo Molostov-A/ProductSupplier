@@ -23,7 +23,7 @@ namespace ProductSupplier.WebApi.Controllers
             _repository = repository;
         }
 
-
+        //[ScriptIgnore]
         public IEnumerable<Category> GetAll()
         {
             return _repository.GetAll();
@@ -42,7 +42,7 @@ namespace ProductSupplier.WebApi.Controllers
         {
             if (categoryViewModel == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             
             var category = new Category()
@@ -56,16 +56,34 @@ namespace ProductSupplier.WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
-        public IActionResult DeleteProduct(string id)
+        public IActionResult Delete(string id)
         {
             var Id = Guid.Parse(id);
             var value = _repository.Find(Id);
             if (value == null)
             {
-                return BadRequest();
+                return NotFound();
             }
             _repository.Delete(value);
             return new ObjectResult(value);
+        }
+
+        [HttpPut("{id}")]
+        public IActionResult Update(string id, [FromBody] Category item)
+        {
+            var Id = Guid.Parse(id);
+            if (id == null || item.Id != Id)
+            {
+                return BadRequest();
+            }
+            var dbItem = _repository.Find(id);
+            if (dbItem == null)
+            {
+                return NotFound();
+            }
+            _repository.Update(id, dbItem);
+            var dbItemUpdate = _repository.Find(id);
+            return new ObjectResult(dbItemUpdate);
         }
     }
 }

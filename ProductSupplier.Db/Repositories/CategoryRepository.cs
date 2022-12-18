@@ -14,6 +14,7 @@ namespace ProductSupplier.Db.Repositories
         {
             _db = databaseContext;
         }
+        
         public List<Category> GetAll()
         {
             var valuesList = _db.Categories.Include(p => p.Products).ToList();
@@ -34,13 +35,27 @@ namespace ProductSupplier.Db.Repositories
 
         public void Update(Guid idOldCategory, Category newCategory)
         {
-            throw new NotImplementedException();
+            var valuesList = _db.Categories.Include(p => p.Products).ToList();
+
+            //_db.Categories.Remove(category);
+            _db.SaveChanges();
+        }
+
+        public void Update(string idOldCategory, Category newCategory)
+        {
+            var Id = Guid.Parse(idOldCategory);
+            Update(Id, newCategory);
         }
 
         public Category Find(Guid id)
         {
             var item = _db.Categories.FirstOrDefault(p => p.Id == id);
             return item;
+        }
+        public Category Find(string id)
+        {
+            var Id = Guid.Parse(id);
+            return Find(Id);
         }
     }
 }

@@ -14,27 +14,30 @@ namespace ProductSupplier.WebApi.Controllers
     [Route("[controller]")]
     public class ProductController : ControllerBase
     {
-        private readonly IRepository<Product> _repository;
+        
+        private readonly IRepository<Product> _repositoryProduct;
+        private readonly IRepository<Category> _repositoryCategory;
         private readonly ILogger<ProductController> _logger;
 
 
-        public ProductController(ILogger<ProductController> logger, IRepository<Product> repository)
+        public ProductController(ILogger<ProductController> logger, IRepository<Product> repositoryProduct, IRepository<Category> repositoryCategory)
         {
             _logger = logger;
-            _repository = repository;
+            _repositoryProduct = repositoryProduct;
+            _repositoryCategory = repositoryCategory;
         }
 
         
         public IEnumerable<Product> GetAll()
         {
-            return _repository.GetAll();
+            return _repositoryProduct.GetAll();
         }
 
         [HttpGet("{id}", Name = "Product")]
         public Product GetUnit(string id)
         {
             var productId = Guid.Parse(id);
-            var product = _repository.Find(productId);
+            var product = _repositoryProduct.Find(productId);
             return product;
         }
 
@@ -43,7 +46,7 @@ namespace ProductSupplier.WebApi.Controllers
         {
             if (productViewModel == null)
             {
-                return BadRequest();
+                return NotFound();
             }
 
             var categories = new List<Category>();
@@ -55,20 +58,49 @@ namespace ProductSupplier.WebApi.Controllers
                 Description = productViewModel.Description,
                 Categories = categories
             };
-            _repository.Add(product);
+            _repositoryProduct.Add(product);
             return new ObjectResult(product);
         }
 
-        [HttpDelete("{idProduct}")]
-        public IActionResult Delete(string idProduct)
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
         {
-            var productId = Guid.Parse(idProduct);
-            var product = _repository.Find(productId);
+            var Id = Guid.Parse(id);
+            var item = _repositoryProduct.Find(Id);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            _repositoryProduct.Delete(item);
+            return new ObjectResult(item);
+        }
+
+        [HttpPut("{idProduct}/{idCategory}")]
+        public IActionResult AddCategoryInProduct(string idProduct, string idCategory)
+        {
+            var product = _repositoryProduct.Find(idProduct);
             if (product == null)
             {
-                return BadRequest();
+                return NotFound();
             }
-            _repository.Delete(product);
+            var category = _repositoryCategory.Find(idCategory);
+            if (product.Categories != null)
+            {
+                if (product.Categories.FirstOrDefault(c => c.Id == category.Id) == null)
+                {
+                    product.Categories.Add(category);
+                    _repositoryProduct.Update(idProduct, product);
+                }
+            }
+            else
+            {
+                product.Categories = new List<Category>()
+                {
+                    category
+                };
+                _repositoryProduct.Update(idProduct, product);
+            }
+
             return new ObjectResult(product);
         }
     }

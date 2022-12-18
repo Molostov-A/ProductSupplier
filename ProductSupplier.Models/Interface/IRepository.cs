@@ -9,6 +9,8 @@ namespace ProductSupplier.Models.Interface
         void Add(T item);
         void Delete(T item);
         void Update(Guid idOldItem, T newItem);
+        void Update(string idOldItem, T newItem);
         T Find(Guid id);
+        T Find(string id);
     }
 }

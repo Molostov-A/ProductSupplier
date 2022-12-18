@@ -15,9 +15,9 @@ namespace ProductSupplier.Db.Repositories
         {
             _db = databaseContext;
         }
-
         public List<Product> GetAll()
         {
+           
             var value =  _db.Products.Include(p => p.Categories).ToList();
             return value;
         }
@@ -36,13 +36,28 @@ namespace ProductSupplier.Db.Repositories
 
         public void Update(Guid idOldProduct, Product newProduct)
         {
-            throw new NotImplementedException();
+            var product = _db.Products
+                .Include(c => c.Categories)
+                .Single(p => p.Id == idOldProduct);
+            product = newProduct;
+            _db.SaveChanges();
+        }
+
+        public void Update(string idOldProduct, Product newProduct)
+        {
+            var Id = Guid.Parse(idOldProduct);
+            Update(Id, newProduct);
         }
 
         public Product Find(Guid id)
         {
             var product = _db.Products.FirstOrDefault(p => p.Id == id);
             return product;
+        }
+        public Product Find(string id)
+        {
+            var Id = Guid.Parse(id);
+            return Find(Id);
         }
     }
 }
