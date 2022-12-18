@@ -39,6 +39,7 @@ namespace ProductSupplier.Db.Repositories
                 .FirstOrDefaultAsync(c => c.Id == idOldProduct);
 
             _db.Products.Remove(valuesList);
+            await _db.SaveChangesAsync();
             var idCategories = new List<Guid>();
             foreach (var category in newProduct.Categories)
             {
@@ -62,7 +63,7 @@ namespace ProductSupplier.Db.Repositories
 
         public async Task<Product> FindAsync(Guid id)
         {
-            return await _db.Products.FirstOrDefaultAsync(p => p.Id == id);
+            return await _db.Products.Include(p => p.Categories).FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task<Product> FindAsync(string id)
         {

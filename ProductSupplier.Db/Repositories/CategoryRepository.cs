@@ -36,11 +36,12 @@ namespace ProductSupplier.Db.Repositories
 
         public async Task UpdateAsync(Guid idOldCategory, Category newCategory)
         {
-            var valuesList = _db.Categories
+            var valuesList = await _db.Categories
                 .Include(p => p.Products)
-                .FirstOrDefault(c => c.Id == idOldCategory);
+                .FirstOrDefaultAsync(c => c.Id == idOldCategory);
 
             _db.Categories.Remove(valuesList);
+            await _db.SaveChangesAsync();
             var idProducts = new List<Guid>();
             foreach (var product in newCategory.Products)
             {
@@ -64,7 +65,7 @@ namespace ProductSupplier.Db.Repositories
 
         public async Task<Category> FindAsync(Guid id)
         {
-            return await _db.Categories.FirstOrDefaultAsync(p => p.Id == id);
+            return await _db.Categories.Include(p => p.Products).FirstOrDefaultAsync(p => p.Id == id);
         }
         public async Task<Category> FindAsync(string id)
         {

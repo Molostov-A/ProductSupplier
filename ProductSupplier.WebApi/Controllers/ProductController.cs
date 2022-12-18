@@ -30,17 +30,21 @@ namespace ProductSupplier.WebApi.Controllers
         }
 
         
-        public async Task<IEnumerable<ProductOutputModel>> GetAllAsync()
+        public async Task<List<ProductOutputModel>> GetAllAsync()
         {
             return MappingManyToManyModel.ProductsListOutput(await _repositoryProduct.GetAllAsync());
         }
 
         [HttpGet("{id}", Name = "Product")]
-        public async Task<ProductOutputModel> GetUnitAsync(string id)
+        public async Task<IActionResult> GetUnitAsync(string id)
         {
             var productId = Guid.Parse(id);
             var product = await _repositoryProduct.FindAsync(productId);
-            return MappingManyToManyModel.ProductOutput(product);
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return Ok(MappingManyToManyModel.ProductOutput(product));
         }
 
         [HttpPost]
@@ -148,14 +152,14 @@ namespace ProductSupplier.WebApi.Controllers
             var category = await _repositoryCategory.FindAsync(idCategory);
             if (product.Categories != null)
             {
-                if (product.Categories.FirstOrDefault(c => c.Id == category.Id) == null)
+                if (product.Categories.FirstOrDefault(c => c.Id == category.Id) != null)
                 {
                     product.Categories.Remove(category);
                     await _repositoryProduct.UpdateAsync(idProduct, product);
                 }
             }
-
-            return Ok(MappingManyToManyModel.ProductOutput(product));
+            var lastProduct = await _repositoryProduct.FindAsync(idProduct);
+            return Ok(MappingManyToManyModel.ProductOutput(lastProduct));
         }
     }
 }

@@ -31,18 +31,22 @@ namespace ProductSupplier.WebApi.Controllers
         }
 
         //[ScriptIgnore]
-        public async Task<IEnumerable<CategoryOutputModel>> GetAllAsync()
+        public async Task<List<CategoryOutputModel>> GetAllAsync()
         {
             var categories = await _repositoryCategory.GetAllAsync();
             return MappingManyToManyModel.CategotyListOutput(categories);
         }
 
         [HttpGet("{id}", Name = "Category")]
-        public async Task<CategoryOutputModel> GetUnitAsync(string id)
+        public async Task<IActionResult> GetUnitAsync(string id)
         {
             var Id = Guid.Parse(id);
             var item = await _repositoryCategory.FindAsync(Id);
-            return MappingManyToManyModel.CategoryOutput(item);
+            if (item == null)
+            {
+                return NotFound();
+            }
+            return Ok(MappingManyToManyModel.CategoryOutput(item));
         }
 
         [HttpPost]
@@ -137,13 +141,15 @@ namespace ProductSupplier.WebApi.Controllers
             var product = await _repositoryProduct.FindAsync(idProduct);
             if (category.Products != null)
             {
-                if (category.Products.FirstOrDefault(c => c.Id == product.Id) == null)
+                if (category.Products.FirstOrDefault(c => c.Id == product.Id) != null)
                 {
                     category.Products.Remove(product);
                     await _repositoryCategory.UpdateAsync(idCategory, category);
                 }
             }
-            return new ObjectResult(MappingManyToManyModel.CategoryOutput(await _repositoryCategory.FindAsync(idCategory)));
+
+            var lastCategory = await _repositoryCategory.FindAsync(idCategory);
+            return new ObjectResult(MappingManyToManyModel.CategoryOutput(lastCategory));
         }
     }
 }
