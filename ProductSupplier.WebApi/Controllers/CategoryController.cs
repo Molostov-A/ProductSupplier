@@ -5,6 +5,7 @@ using ProductSupplier.Models.Interface;
 using ProductSupplier.Models;
 using System.Collections.Generic;
 using System;
+using System.Linq;
 using ProductSupplier.WebApi.ViewModels;
 
 namespace ProductSupplier.WebApi.Controllers
@@ -13,27 +14,29 @@ namespace ProductSupplier.WebApi.Controllers
     [Route("[controller]")]
     public class CategoryController : Controller
     {
-        private readonly IRepository<Category> _repository;
+        private readonly IRepository<Category> _repositoryCategory;
+        private readonly IRepository<Product> _repositoryProduct;
         private readonly ILogger<CategoryController> _logger;
 
 
-        public CategoryController(ILogger<CategoryController> logger, IRepository<Category> repository)
+        public CategoryController(ILogger<CategoryController> logger, IRepository<Category> repositoryCategory, IRepository<Product> repositoryProduct)
         {
             _logger = logger;
-            _repository = repository;
+            _repositoryCategory = repositoryCategory;
+            _repositoryProduct = repositoryProduct;
         }
 
         //[ScriptIgnore]
         public IEnumerable<Category> GetAll()
         {
-            return _repository.GetAll();
+            return _repositoryCategory.GetAll();
         }
 
         [HttpGet("{id}", Name = "Category")]
         public Category GetUnit(string id)
         {
             var Id = Guid.Parse(id);
-            var item = _repository.Find(Id);
+            var item = _repositoryCategory.Find(Id);
             return item;
         }
 
@@ -51,7 +54,7 @@ namespace ProductSupplier.WebApi.Controllers
                 Name = categoryViewModel.Name,
                 Description = categoryViewModel.Description
             };
-            _repository.Add(category);
+            _repositoryCategory.Add(category);
             return new ObjectResult(category);
         }
 
@@ -59,12 +62,12 @@ namespace ProductSupplier.WebApi.Controllers
         public IActionResult Delete(string id)
         {
             var Id = Guid.Parse(id);
-            var value = _repository.Find(Id);
+            var value = _repositoryCategory.Find(Id);
             if (value == null)
             {
                 return NotFound();
             }
-            _repository.Delete(value);
+            _repositoryCategory.Delete(value);
             return new ObjectResult(value);
         }
 
@@ -76,14 +79,42 @@ namespace ProductSupplier.WebApi.Controllers
             {
                 return BadRequest();
             }
-            var dbItem = _repository.Find(id);
+            var dbItem = _repositoryCategory.Find(id);
             if (dbItem == null)
             {
                 return NotFound();
             }
-            _repository.Update(id, dbItem);
-            var dbItemUpdate = _repository.Find(id);
+            _repositoryCategory.Update(id, dbItem);
+            var dbItemUpdate = _repositoryCategory.Find(id);
             return new ObjectResult(dbItemUpdate);
+        }
+
+        [HttpPut("{idCategory}/{idProduct}")]
+        public IActionResult AddProductInCategory(string idCategory, string idProduct)
+        {
+            var category = _repositoryCategory.Find(idCategory);
+            if (category == null)
+            {
+                return NotFound();
+            }
+            var product = _repositoryProduct.Find(idProduct);
+            if (category.Products != null)
+            {
+                if (category.Products.FirstOrDefault(c => c.Id == product.Id) == null)
+                {
+                    category.Products.Add(product);
+                    _repositoryCategory.Update(idCategory, category);
+                }
+            }
+            else
+            {
+                category.Products = new List<Product>()
+                {
+                    product
+                };
+                _repositoryCategory.Update(idCategory, category);
+            }
+            return new ObjectResult(_repositoryProduct.Find(idProduct));
         }
     }
 }
