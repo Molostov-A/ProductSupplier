@@ -6,6 +6,8 @@ using System.Linq;
 using System.Threading.Tasks;
 using ProductSupplier.Models;
 using ProductSupplier.Models.Interface;
+using ProductSupplier.WebApi.Mapper;
+using ProductSupplier.WebApi.OutputModels;
 using ProductSupplier.WebApi.ViewModels;
 
 namespace ProductSupplier.WebApi.Controllers
@@ -28,17 +30,17 @@ namespace ProductSupplier.WebApi.Controllers
         }
 
         
-        public IEnumerable<Product> GetAll()
+        public IEnumerable<ProductOutputModel> GetAll()
         {
-            return _repositoryProduct.GetAll();
+            return MappingManyToManyModel.ProductsListOutput(_repositoryProduct.GetAll());
         }
 
         [HttpGet("{id}", Name = "Product")]
-        public Product GetUnit(string id)
+        public ProductOutputModel GetUnit(string id)
         {
             var productId = Guid.Parse(id);
             var product = _repositoryProduct.Find(productId);
-            return product;
+            return MappingManyToManyModel.ProductOutput(product);
         }
 
         [HttpPost]
@@ -59,7 +61,7 @@ namespace ProductSupplier.WebApi.Controllers
                 Categories = categories
             };
             _repositoryProduct.Add(product);
-            return new ObjectResult(product);
+            return new ObjectResult(MappingManyToManyModel.ProductOutput(product));
         }
 
         [HttpDelete("{id}")]
@@ -72,7 +74,7 @@ namespace ProductSupplier.WebApi.Controllers
                 return NotFound();
             }
             _repositoryProduct.Delete(item);
-            return new ObjectResult(item);
+            return new ObjectResult(MappingManyToManyModel.ProductOutput(item));
         }
 
         [HttpPut("{idProduct}/{idCategory}")]
@@ -101,7 +103,7 @@ namespace ProductSupplier.WebApi.Controllers
                 _repositoryProduct.Update(idProduct, product);
             }
 
-            return new ObjectResult(product);
+            return new ObjectResult(MappingManyToManyModel.ProductOutput(product));
         }
     }
 }

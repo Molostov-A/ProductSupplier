@@ -6,6 +6,9 @@ using ProductSupplier.Models;
 using System.Collections.Generic;
 using System;
 using System.Linq;
+using Microsoft.EntityFrameworkCore.Metadata.Conventions;
+using ProductSupplier.WebApi.Mapper;
+using ProductSupplier.WebApi.OutputModels;
 using ProductSupplier.WebApi.ViewModels;
 
 namespace ProductSupplier.WebApi.Controllers
@@ -27,17 +30,17 @@ namespace ProductSupplier.WebApi.Controllers
         }
 
         //[ScriptIgnore]
-        public IEnumerable<Category> GetAll()
+        public IEnumerable<CategoryOutputModel> GetAll()
         {
-            return _repositoryCategory.GetAll();
+            return MappingManyToManyModel.CategotyListOutput(_repositoryCategory.GetAll());
         }
 
         [HttpGet("{id}", Name = "Category")]
-        public Category GetUnit(string id)
+        public CategoryOutputModel GetUnit(string id)
         {
             var Id = Guid.Parse(id);
             var item = _repositoryCategory.Find(Id);
-            return item;
+            return MappingManyToManyModel.CategoryOutput(item);
         }
 
         [HttpPost]
@@ -55,20 +58,20 @@ namespace ProductSupplier.WebApi.Controllers
                 Description = categoryViewModel.Description
             };
             _repositoryCategory.Add(category);
-            return new ObjectResult(category);
+            return new ObjectResult(MappingManyToManyModel.CategoryOutput(category));
         }
 
         [HttpDelete("{id}")]
         public IActionResult Delete(string id)
         {
             var Id = Guid.Parse(id);
-            var value = _repositoryCategory.Find(Id);
-            if (value == null)
+            var item = _repositoryCategory.Find(Id);
+            if (item == null)
             {
                 return NotFound();
             }
-            _repositoryCategory.Delete(value);
-            return new ObjectResult(value);
+            _repositoryCategory.Delete(item);
+            return new ObjectResult(MappingManyToManyModel.CategoryOutput(item));
         }
 
         [HttpPut("{id}")]
@@ -86,7 +89,7 @@ namespace ProductSupplier.WebApi.Controllers
             }
             _repositoryCategory.Update(id, dbItem);
             var dbItemUpdate = _repositoryCategory.Find(id);
-            return new ObjectResult(dbItemUpdate);
+            return new ObjectResult(MappingManyToManyModel.CategoryOutput(dbItemUpdate));
         }
 
         [HttpPut("{idCategory}/{idProduct}")]
@@ -114,7 +117,7 @@ namespace ProductSupplier.WebApi.Controllers
                 };
                 _repositoryCategory.Update(idCategory, category);
             }
-            return new ObjectResult(_repositoryProduct.Find(idProduct));
+            return new ObjectResult(MappingManyToManyModel.CategoryOutput(_repositoryCategory.Find(idCategory)));
         }
     }
 }
