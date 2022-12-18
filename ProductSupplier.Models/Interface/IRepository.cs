@@ -1,16 +1,17 @@
 ﻿using System.Collections.Generic;
 using System;
+using System.Threading.Tasks;
 
 namespace ProductSupplier.Models.Interface
 {
     public interface IRepository<T>
     {
-        List<T> GetAll();
-        void Add(T item);
-        void Delete(T item);
-        void Update(Guid idOldItem, T newItem);
-        void Update(string idOldItem, T newItem);
-        T Find(Guid id);
-        T Find(string id);
+        Task<List<T>> GetAllAsync();
+        Task AddAsync(T item);
+        Task DeleteAsync(T item);
+        Task UpdateAsync(Guid idOldItem, T newItem);
+        Task UpdateAsync(string idOldItem, T newItem);
+        Task<T> FindAsync(Guid id);
+        Task<T> FindAsync(string id);
     }
 }

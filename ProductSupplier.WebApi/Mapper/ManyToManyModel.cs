@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ProductSupplier.Models;
 using ProductSupplier.WebApi.OutputModels;
 
@@ -169,6 +170,11 @@ namespace ProductSupplier.WebApi.Mapper
                 };
             }
             return inputModel;
+        }
+
+        public static Task<IEnumerable<CategoryOutputModel>> CategotyListOutputAsync(Task<List<Category>> getAllAsync)
+        {
+            throw new System.NotImplementedException();
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProductSupplier.Models;
 using ProductSupplier.Models.Interface;
@@ -15,25 +16,25 @@ namespace ProductSupplier.Db.Repositories
             _db = databaseContext;
         }
         
-        public List<Category> GetAll()
+        public async Task<List<Category>> GetAllAsync()
         {
-            var valuesList = _db.Categories.Include(p => p.Products).ToList();
+            var valuesList = await _db.Categories.Include(p => p.Products).ToListAsync();
             return valuesList;
         }
 
-        public void Add(Category category)
+        public async Task AddAsync(Category category)
         {
             _db.Categories.Add(category);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Delete(Category category)
+        public async Task DeleteAsync(Category category)
         {
             _db.Categories.Remove(category);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Update(Guid idOldCategory, Category newCategory)
+        public async Task UpdateAsync(Guid idOldCategory, Category newCategory)
         {
             var valuesList = _db.Categories
                 .Include(p => p.Products)
@@ -49,27 +50,26 @@ namespace ProductSupplier.Db.Repositories
             newCategory.Products = new List<Product>();
             foreach (var id in idProducts)
             {
-                newCategory.Products.Add(_db.Products.Find(id));
+                newCategory.Products.Add(await _db.Products.FindAsync(id));
             }
             _db.Categories.Add(newCategory);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Update(string idOldCategory, Category newCategory)
+        public async Task UpdateAsync(string idOldCategory, Category newCategory)
         {
             var Id = Guid.Parse(idOldCategory);
-            Update(Id, newCategory);
+            await UpdateAsync(Id, newCategory);
         }
 
-        public Category Find(Guid id)
+        public async Task<Category> FindAsync(Guid id)
         {
-            var item = _db.Categories.FirstOrDefault(p => p.Id == id);
-            return item;
+            return await _db.Categories.FirstOrDefaultAsync(p => p.Id == id);
         }
-        public Category Find(string id)
+        public async Task<Category> FindAsync(string id)
         {
             var Id = Guid.Parse(id);
-            return Find(Id);
+            return await FindAsync(Id);
         }
     }
 }
