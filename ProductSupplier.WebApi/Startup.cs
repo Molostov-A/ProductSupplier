@@ -35,8 +35,8 @@ namespace ProductSupplier.WebApi
             services.AddControllers();
             string connection = Configuration.GetConnectionString("product_supplier");
             services.AddDbContext<DatabaseContext>(options => options.UseSqlServer(connection));
-            services.AddTransient<IRepository<Product>, ProductRepository>();
-            services.AddTransient<IRepository<Category>, CategoryRepository>();
+            services.AddScoped<IRepository<Product>, ProductRepository>();
+            services.AddScoped<IRepository<Category>, CategoryRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

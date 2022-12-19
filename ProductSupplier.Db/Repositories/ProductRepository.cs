@@ -15,32 +15,31 @@ namespace ProductSupplier.Db.Repositories
         {
             _db = databaseContext;
         }
-        public List<Product> GetAll()
+        public async Task<List<Product>> GetAllAsync()
         {
-           
-            var value =  _db.Products.Include(p => p.Categories).ToList();
-            return value;
+            return await _db.Products.Include(p => p.Categories).ToListAsync();
         }
 
-        public void Add(Product product)
+        public async Task AddAsync(Product product)
         {
             _db.Products.Add(product);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Delete(Product product)
+        public async Task DeleteAsync(Product item)
         {
-            _db.Products.Remove(product);
-            _db.SaveChanges();
+            _db.Products.Remove(item);
+            await _db.SaveChangesAsync();
         }
 
-        public void Update(Guid idOldProduct, Product newProduct)
+        public async Task UpdateAsync(Guid idOldProduct, Product newProduct)
         {
-            var valuesList = _db.Products
+            var valuesList = await _db.Products
                 .Include(p => p.Categories)
-                .FirstOrDefault(c => c.Id == idOldProduct);
+                .FirstOrDefaultAsync(c => c.Id == idOldProduct);
 
             _db.Products.Remove(valuesList);
+            await _db.SaveChangesAsync();
             var idCategories = new List<Guid>();
             foreach (var category in newProduct.Categories)
             {
@@ -50,27 +49,26 @@ namespace ProductSupplier.Db.Repositories
             newProduct.Categories = new List<Category>();
             foreach (var id in idCategories)
             {
-                newProduct.Categories.Add(_db.Categories.Find(id));
+                newProduct.Categories.Add(await _db.Categories.FindAsync(id));
             }
             _db.Products.Add(newProduct);
-            _db.SaveChanges();
+            await _db.SaveChangesAsync();
         }
 
-        public void Update(string idOldProduct, Product newProduct)
+        public async Task UpdateAsync(string idOldProduct, Product newProduct)
         {
             var Id = Guid.Parse(idOldProduct);
-            Update(Id, newProduct);
+            await UpdateAsync(Id, newProduct);
         }
 
-        public Product Find(Guid id)
+        public async Task<Product> FindAsync(Guid id)
         {
-            var product = _db.Products.FirstOrDefault(p => p.Id == id);
-            return product;
+            return await _db.Products.Include(p => p.Categories).FirstOrDefaultAsync(p => p.Id == id);
         }
-        public Product Find(string id)
+        public async Task<Product> FindAsync(string id)
         {
             var Id = Guid.Parse(id);
-            return Find(Id);
+            return await FindAsync(Id);
         }
     }
 }

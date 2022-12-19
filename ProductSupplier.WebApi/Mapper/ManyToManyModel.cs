@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using ProductSupplier.Models;
 using ProductSupplier.WebApi.OutputModels;
 
@@ -44,9 +45,10 @@ namespace ProductSupplier.WebApi.Mapper
                 outputModel = new ProductOutputModel()
                 {
                     Id = inputModel.Id,
+                    Price = inputModel.Price,
                     Name = inputModel.Name,
                     Description = inputModel.Description,
-                    Categories = null
+                    Categories = new List<CategoryInProductOutputModel>()
                 };
             }
             return outputModel;
@@ -82,7 +84,7 @@ namespace ProductSupplier.WebApi.Mapper
                     Id = model.Id,
                     Name = model.Name,
                     Description = model.Description,
-                    Categories = null
+                    Categories = new List<Category>()
                 };
             }
             return inputModel;
@@ -127,7 +129,7 @@ namespace ProductSupplier.WebApi.Mapper
                     Id = inputModel.Id,
                     Name = inputModel.Name,
                     Description = inputModel.Description,
-                    Products = null
+                    Products = new List<ProductInCategoryOutputModel>()
                 };
             }
             return outputModel;
@@ -165,7 +167,7 @@ namespace ProductSupplier.WebApi.Mapper
                     Id = model.Id,
                     Name = model.Name,
                     Description = model.Description,
-                    Products = null
+                    Products = new List<Product>()
                 };
             }
             return inputModel;
