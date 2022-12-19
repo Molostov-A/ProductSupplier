@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using ProductSupplier.Models;
@@ -39,11 +40,7 @@ namespace ProductSupplier.Db.Repositories
 
             _db.Products.Remove(valuesList);
             await _db.SaveChangesAsync();
-            var idCategories = new List<Guid>();
-            foreach (var category in newProduct.Categories)
-            {
-                idCategories.Add(category.Id);
-            }
+            var idCategories = newProduct.Categories.Select(n => n.Id).ToList();
 
             newProduct.Categories = new List<Category>();
             foreach (var id in idCategories)
@@ -57,7 +54,10 @@ namespace ProductSupplier.Db.Repositories
         public async Task UpdateAsync(string idOldProduct, Product newProduct)
         {
             var Id = Guid.Parse(idOldProduct);
-            await UpdateAsync(Id, newProduct);
+            if (Id != Guid.Empty)
+            {
+                await UpdateAsync(Id, newProduct);
+            }
         }
 
         public async Task<Product> FindAsync(Guid id)
