@@ -1,12 +1,20 @@
 ﻿using System.Collections.Generic;
-using System.Threading.Tasks;
 using ProductSupplier.Models;
 using ProductSupplier.WebApi.OutputModels;
 
 namespace ProductSupplier.WebApi.Mapper
 {
+    /// <summary>
+    /// Статический класс для решения проблемы циклических ссылок,
+    /// для таблиц, связанных по принципу "многое-ко-многим"
+    /// </summary>
     public static class MappingManyToManyModel
     {
+        /// <summary>
+        /// Конвертировать List<Product> в список для вывода в JSON List<ProductOutputModel> без циклических ссылок
+        /// </summary>
+        /// <param name="listProducts"></param>
+        /// <returns></returns>
         public static List<ProductOutputModel> ProductsListOutput(List<Product> listProducts)
         {
             var listProductsOutputModel = new List<ProductOutputModel>();
@@ -16,6 +24,12 @@ namespace ProductSupplier.WebApi.Mapper
             }
             return listProductsOutputModel;
         }
+
+        /// <summary>
+        /// Перевод модели БД Product в модель вывода данных ProductOutputModel, без циклических ссылок
+        /// </summary>
+        /// <param name="inputModel"></param>
+        /// <returns></returns>
         public static ProductOutputModel ProductOutput(Product inputModel)
         {
             var outputModel = new ProductOutputModel();
@@ -53,6 +67,12 @@ namespace ProductSupplier.WebApi.Mapper
             }
             return outputModel;
         }
+
+        /// <summary>
+        /// Конвектрировать модель для вывода данных ProductOutputModel в модель для БД - Product
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static Product ProductInput(ProductOutputModel model)
         {
             var inputModel = new Product();
@@ -89,7 +109,13 @@ namespace ProductSupplier.WebApi.Mapper
             }
             return inputModel;
         }
-        public static List<CategoryOutputModel> CategotyListOutput(List<Category> listCategory)
+
+        /// <summary>
+        /// Конвертировать List<Category> в список для вывода в JSON List<CategoryOutputModel> без циклических ссылок
+        /// </summary>
+        /// <param name="listProducts"></param>
+        /// <returns></returns>
+        public static List<CategoryOutputModel> CategoryListOutput(List<Category> listCategory)
         {
             var listCategoryOutputModel = new List<CategoryOutputModel>();
             foreach (var category in listCategory)
@@ -98,6 +124,12 @@ namespace ProductSupplier.WebApi.Mapper
             }
             return listCategoryOutputModel;
         }
+
+        /// <summary>
+        /// Перевод модели БД Category в модель вывода данных CategoryOutputModel, без циклических ссылок
+        /// </summary>
+        /// <param name="inputModel"></param>
+        /// <returns></returns>
         public static CategoryOutputModel CategoryOutput(Category inputModel)
         {
             var outputModel = new CategoryOutputModel();
@@ -135,6 +167,11 @@ namespace ProductSupplier.WebApi.Mapper
             return outputModel;
         }
 
+        /// <summary>
+        /// Конвектрировать модель для вывода данных CategoryOutputModel в модель для БД - Category
+        /// </summary>
+        /// <param name="model"></param>
+        /// <returns></returns>
         public static Category CategoryInput(CategoryOutputModel model)
         {
             var inputModel = new Category();

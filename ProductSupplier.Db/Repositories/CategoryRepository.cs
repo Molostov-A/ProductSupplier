@@ -42,11 +42,8 @@ namespace ProductSupplier.Db.Repositories
 
             _db.Categories.Remove(valuesList);
             await _db.SaveChangesAsync();
-            var idProducts = new List<Guid>();
-            foreach (var product in newCategory.Products)
-            {
-                idProducts.Add(product.Id);
-            }
+
+            var idProducts = newCategory.Products.Select(n => n.Id).ToList();
 
             newCategory.Products = new List<Product>();
             foreach (var id in idProducts)
@@ -60,7 +57,10 @@ namespace ProductSupplier.Db.Repositories
         public async Task UpdateAsync(string idOldCategory, Category newCategory)
         {
             var Id = Guid.Parse(idOldCategory);
-            await UpdateAsync(Id, newCategory);
+            if (Id != Guid.Empty)
+            {
+                await UpdateAsync(Id, newCategory);
+            }
         }
 
         public async Task<Category> FindAsync(Guid id)

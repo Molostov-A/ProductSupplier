@@ -1,5 +1,4 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using ProductSupplier.Models.Interface;
 using ProductSupplier.Models;
@@ -7,7 +6,6 @@ using System.Collections.Generic;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
-using Microsoft.EntityFrameworkCore.Metadata.Conventions;
 using ProductSupplier.WebApi.Mapper;
 using ProductSupplier.WebApi.OutputModels;
 using ProductSupplier.WebApi.ViewModels;
@@ -34,7 +32,7 @@ namespace ProductSupplier.WebApi.Controllers
         public async Task<List<CategoryOutputModel>> GetAllAsync()
         {
             var categories = await _repositoryCategory.GetAllAsync();
-            return MappingManyToManyModel.CategotyListOutput(categories);
+            return MappingManyToManyModel.CategoryListOutput(categories);
         }
 
         [HttpGet("{id}", Name = "Category")]

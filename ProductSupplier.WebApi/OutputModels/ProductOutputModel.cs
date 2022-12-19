@@ -1,5 +1,4 @@
-﻿using ProductSupplier.Models;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System;
 
 namespace ProductSupplier.WebApi.OutputModels
